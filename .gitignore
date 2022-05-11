@@ -2,5 +2,4 @@
 data/
 .venv
 ../venv/
-pgadmin/
-notes.py
+.coverage

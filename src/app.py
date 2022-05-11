@@ -2,20 +2,17 @@ from typing import Dict, List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
-# from sqlalchemy.orm.decl_api import DeclarativeMeta
 from sqlalchemy.orm import Session
 
 from src import db_service, models, schemas
 from src.logger import logger
 
-# from src import models, schemas
-# import src.db_service
-
-
 app = FastAPI()
 
 
 def handle_db_exceptions(err: SQLAlchemyError) -> None:
+    """creating an exception if any errors occur during
+    interaction with the database"""
     if err is not None:
 
         logger.exception(err)
@@ -26,14 +23,13 @@ def handle_db_exceptions(err: SQLAlchemyError) -> None:
         )
 
 
-
-
 def check_db_item(
     db: Session,
     model: "sqlalchemy.orm.decl_api.DeclarativeMeta",
     item_id: int,
     error_message: str,
 ) -> Optional[models.Base]:
+    """check if item exist in the database"""
     item = db_service.get_db_item(session=db, model=model, item_id=item_id)
     if item is None:
         logger.exception(error_message)
@@ -48,6 +44,7 @@ def create_dealer(
     dealer: schemas.NewDealer,
     db: Session = Depends(db_service.get_session),
 ) -> Dict[str, str]:
+    """create dealer instance"""
     err = db_service.create_db_item(db, scheme=dealer, model=models.Dealer)
     handle_db_exceptions(err=err)
     return {"detail": "created"}
@@ -58,6 +55,7 @@ def get_dealers(
     dealer: schemas.SearchDealer,
     db: Session = Depends(db_service.get_session),
 ) -> List[models.Dealer]:
+    """get dealers by search parameters"""
     return db_service.search_db_items(db, scheme=dealer, model=models.Dealer)
 
 
@@ -67,6 +65,7 @@ async def change_dealer(
     dealer: schemas.ChangeDealer,
     db: Session = Depends(db_service.get_session),
 ) -> Dict[str, str]:
+    """change dealer instance by its parameters"""
     old_dealer = check_db_item(
         db=db,
         model=models.Dealer,
@@ -83,6 +82,7 @@ async def delete_dealer(
     dealer_id: int,
     db: Session = Depends(db_service.get_session),
 ) -> Dict[str, str]:
+    """delete dealer instance"""
     old_dealer = check_db_item(
         db=db,
         model=models.Dealer,
@@ -98,6 +98,7 @@ async def delete_dealer(
 async def create_car(
     car: schemas.NewCar, db: Session = Depends(db_service.get_session)
 ) -> Dict[str, str]:
+    """create car instance"""
     check_db_item(
         db=db,
         model=models.Dealer,
@@ -112,6 +113,7 @@ async def create_car(
 async def get_cars(
     car: schemas.SearchCar, db: Session = Depends(db_service.get_session)
 ) -> List[models.Car]:
+    """get cars by search parameters"""
     return db_service.search_db_items(db, car, models.Car)
 
 
@@ -121,6 +123,7 @@ async def change_car(
     car: schemas.ChangeCar,
     db: Session = Depends(db_service.get_session),
 ) -> Dict[str, str]:
+    """change car instance by its parameters"""
     old_car = check_db_item(
         db=db,
         model=models.Car,
@@ -143,6 +146,7 @@ async def change_car(
 async def delete_car(
     car_id: int, db: Session = Depends(db_service.get_session)
 ) -> Dict[str, str]:
+    """delete car instance"""
     old_car = check_db_item(
         db=db,
         model=models.Car,
@@ -151,8 +155,3 @@ async def delete_car(
     )
     db_service.delete_db_item(session=db, item=old_car)
     return {"detail": "deleted"}
-
-
-
-
-

@@ -7,14 +7,15 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from src import models
+from src.config import DATABASE_URL
 
-engine = create_engine("postgresql+psycopg2://postgres:1234@db:5432/cars")
+engine = create_engine(DATABASE_URL)
 
 Session = sessionmaker(bind=engine)
 
 
 def get_session() -> Generator[Session, None, None]:
-    """Get session generator to work with the db."""
+    """Get session generator to work with the db"""
     session = Session()
     try:
         yield session
@@ -41,6 +42,7 @@ def search_db_items(
     scheme: pydantic.BaseModel,
     model: "sqlalchemy.orm.decl_api.DeclarativeMeta",
 ) -> List[models.Base]:
+    """get database items by search parameters"""
     item_params = scheme.dict()
     search_params = {}
     for item_param in item_params:
@@ -61,6 +63,7 @@ def get_db_item(
 def change_db_item(
     session: Session, scheme: pydantic.BaseModel, item: models.Base
 ) -> Optional[SQLAlchemyError]:
+    """change database item by parameters"""
     schema_params = scheme.dict()
     for schema_param in schema_params:
         if schema_params[schema_param] is not None:

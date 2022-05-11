@@ -1,20 +1,68 @@
+### Description
+
+cars is a simple API for interaction with the information on dealers and cars. 
+
+API supports the following operations: 
+- creating instance of dealers and cars;
+- search the information on dealers and cars;
+- update the information on dealers and cars;
+- delete the dealers and cars.
+
 ### Prerequisites
 
-Before you continue, you have to install Docker and Docker-Compose.
+#### there is two ways to run api: by using docker [recommended] or run itself
 
-### Run App
-
+#### Run API by using docker:
+- install Docker and Docker-Compose.
 - move to the project root directory
-- run the docker container: `$ docker-compose up`
+- run the docker container: `$ docker-compose up --build -d`
+- wait for the docker to start. It may take a minute
 - open the browser
 - insert the next address in browser: `http://localhost:8000/docs#`
 - you will see the swagger window: 
 
-<details><summary>
+![](images/1.jpg)
 
-![rrrr](images/1.jpg)
-</summary>
-</details>
+- run sql script with the data for the experiments:
+
+`$ docker exec -i db /bin/bash -c "PGPASSWORD=1234 psql --username postgres cars" < dump.sql`
+
+#### Run API without docker:
+- install postgres
+- create database 'cars' with the next parameters:
+
+`database username: postgres`
+
+`database password: 1234`
+
+`database name: cars`
+
+- move to the project root directory
+- run command: `$ alembic upgrade head`
+- run api: `$ uvicorn src.app:app`
+- open the browser
+- insert the next address in browser: `http://localhost:8000/docs#`
+- you will see the swagger window (see above):
+- run sql script with the data for the experiments (you can do this in any convenient way (for example by using pgadmin) or do it as follows):
+
+    - open sql shell (psql)
+    - enter the following commands:
+    
+    `Server [localhost]: localhost`
+    
+    `Database [postgres]: cars`
+    
+    `Port [5432]: 5432`
+    
+    `Username [postgres]: postgres`
+    
+    `password: 1234`
+    
+    - insert sql expressions from the file dump.sql in the project root directory
+    
+### To run the tests, do the next steps:
+- move to the project root directory
+- run the next command: `$ pytest`
 
 ### Examples of usage:
 
@@ -57,11 +105,30 @@ Before you continue, you have to install Docker and Docker-Compose.
       ````
     
 ##### Note: field dealer_name should be unique
+
+##### JSON Schema:
+    {
+      "type": "object",
+      "properties": {
+        "dealer_name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "dealer_name"
+      ]
+    }
     
 </details>
 
 <hr>
-<details><summary><h4>Get Dialers</h4></summary>
+<details><summary><h4>Get Dealers</h4></summary>
 
 ##### Description: search for dealers by specified parameters
 
@@ -83,25 +150,21 @@ Before you continue, you have to install Docker and Docker-Compose.
     ````
     [
       {
-        "dealer_name": "gggg",
-        "address": "string",
-        "phone": "string",
-        "id": 179
+        "address": "357 Philip Heights Apt. 877 New Stephanie, SD 66159",
+        "phone": "14155552671",
+        "id": 1,
+        "dealer_name": "VROOM"
       },
       {
-        "dealer_name": "vv",
-        "address": "string",
-        "phone": "string",
-        "id": 182
-      },
-      {
-        "dealer_name": "c",
-        "address": "string",
-        "phone": "string",
-        "id": 183
-      },
+        "address": "13245 Sullivan Mount Suite 489 Bryanborough, ME 94533",
+        "phone": "14187581856",
+        "id": 2,
+        "dealer_name": "Carvana"
+      }
     ]
     ````
+
+    
 ##### Request (to get specified dealer):
 - ````
     curl -X 'POST' \
@@ -109,10 +172,8 @@ Before you continue, you have to install Docker and Docker-Compose.
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
-      "id": 179,
-      "dealer_name": "gggg",
-      "address": "string",
-      "phone": "string"
+      "id": 1,
+      "dealer_name": "VROOM"
     }'
     ````
 ##### Response:
@@ -121,10 +182,10 @@ Before you continue, you have to install Docker and Docker-Compose.
 - ````
     [
       {
-        "dealer_name": "gggg",
-        "address": "string",
-        "phone": "string",
-        "id": 179
+        "address": "357 Philip Heights Apt. 877 New Stephanie, SD 66159",
+        "phone": "14155552671",
+        "id": 1,
+        "dealer_name": "VROOM"
       }
     ]
     ````
@@ -134,12 +195,31 @@ Before you continue, you have to install Docker and Docker-Compose.
 - ````
   []
   ````
+##### JSON Schema:
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "dealer_name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        }
+      }
+    }
+
 </details>
 
 <hr>
 <details><summary><h4>Change Dealer</h4></summary>
 
-##### Description: change dealer parameters
+##### Description: change dealer according to parameters
 
 ##### URL: http://localhost:8000/dealer/<dealer_id>
 
@@ -168,6 +248,23 @@ Before you continue, you have to install Docker and Docker-Compose.
     ````
     {"detail": "(psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint \"dealer_dealer_name_key\"\nDETAIL:  Key (dealer_name)=(string) already exists.\n\n[SQL: UPDATE dealer SET dealer_name=%(dealer_name)s WHERE dealer.id = %(dealer_id)s]\n[parameters: {'dealer_name': 'string', 'dealer_id': 179}]\n(Background on this error at: https://sqlalche.me/e/14/gkpj)"}
     ````
+  
+##### JSON Schema:
+    {
+      "type": "object",
+      "properties": {
+        "dealer_name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        }
+      }
+    }
+  
 </details>
 
 <hr>
@@ -207,6 +304,10 @@ curl -X 'DELETE' \
 <hr>
 <details><summary><h4>Create Car</h4></summary>
 
+##### Description: creates a car with the specified parameters
+
+##### URL: http://localhost:8000/car
+
 ##### Request:
 - ````
     curl -X 'POST' \
@@ -215,7 +316,7 @@ curl -X 'DELETE' \
       -H 'Content-Type: application/json' \
       -d '{
       "model": "string",
-      "dealer_id": 0
+      "dealer_id": 1
     }'
     ````
 ##### Responses:
@@ -232,10 +333,45 @@ curl -X 'DELETE' \
   - ````
     {"detail": "dealer with this ID doesn't exist"}
     ````
+
+##### JSON Schema
+    {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "color": {
+          "type": "string"
+        },
+        "mileage": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "integer"
+        },
+        "dealer_id": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "model",
+        "dealer_id"
+      ]
+    }
+    
+    
 </details>
 
 <hr>
 <details><summary><h4>Get Cars</h4></summary>
+
+##### Description: search for cars by specified parameters
+
+##### URL: http://localhost:8000/car/search
 
 ##### Request (to get all cars):
 ````
@@ -243,9 +379,7 @@ curl -X 'POST' \
   'http://localhost:8000/car/search' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -d '{
-
-}'
+  -d '{}'
 ````
 ##### Response:
 - status code: 201
@@ -253,24 +387,31 @@ curl -X 'POST' \
 ````
 [
   {
-    "model": "string",
-    "dealer_id": 105,
-    "id": 26
+    "model": "Focus S",
+    "year": 2011,
+    "mileage": 85000,
+    "price": 7995,
+    "id": 1,
+    "color": "Blue Flame Metallic",
+    "dealer_id": 1
   },
   {
-    "model": "string",
-    "dealer_id": 105,
-    "id": 27
+    "model": "Focus S",
+    "year": 2015,
+    "mileage": 45000,
+    "price": 18000,
+    "id": 2,
+    "color": "Blue Flame Metallic",
+    "dealer_id": 2
   },
   {
-    "model": "string",
-    "dealer_id": 105,
-    "id": 28
-  },
-  {
-    "model": "string",
-    "dealer_id": 135,
-    "id": 25
+    "model": "Nissan Frontier SV",
+    "year": 2020,
+    "mileage": 41209,
+    "price": 26391,
+    "id": 3,
+    "color": "Steel",
+    "dealer_id": 2
   }
 ]
 ````
@@ -281,7 +422,7 @@ curl -X 'POST' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "id": 26
+  "id": 1
 }'
 ````
 ##### Response:
@@ -290,9 +431,13 @@ curl -X 'POST' \
     ````
     [
       {
-        "model": "string",
-        "dealer_id": 105,
-        "id": 26
+        "model": "Focus S",
+        "year": 2011,
+        "mileage": 85000,
+        "price": 7995,
+        "id": 1,
+        "color": "Blue Flame Metallic",
+        "dealer_id": 1
       }
     ]
     ````
@@ -302,10 +447,40 @@ curl -X 'POST' \
 - ````
   []
   ````
+  
+##### JSON Schema:
+    {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "color": {
+          "type": "string"
+        },
+        "mileage": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "integer"
+        },
+        "dealer_id": {
+          "type": "integer"
+        }
+      }
+    }
+  
 </details>
 
 <hr>
 <details><summary><h4>Change Car</h4></summary>
+
+##### Description: change car according to parameters
+
+##### URL: http://localhost:8000/car/<car_id>
 
 ##### Request:
 ````
@@ -338,10 +513,38 @@ curl -X 'PUT' \
   ````
   {"detail": "dealer with this ID doesn't exist"}
   ````
+##### JSON Schema
+    {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "color": {
+          "type": "string"
+        },
+        "mileage": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "integer"
+        },
+        "dealer_id": {
+          "type": "integer"
+        }
+      }
+    }
+  
 </details>
 
 <hr>
 <details><summary><h4>Delete Car</h4></summary>
+
+##### URL: http://localhost:8000/car/<car_id>
 
 ##### Request:
 ````
@@ -362,6 +565,7 @@ curl -X 'DELETE' \
   ````
   {"detail": "car with this ID doesn't exist"}
   ````
+  
 </details>
 </details>
 

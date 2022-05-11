@@ -3,24 +3,24 @@ import pytest
 MOCK_NEW_DEALER_1 = {
     "dealer_name": "dealer_1",
     "address": "address_1",
-    "phone": "phone_1",
+    "phone": 10000000001,
 }
 
 MOCK_NEW_DEALER_2 = {
     "dealer_name": "dealer_2",
     "address": "address_1",
-    "phone": "phone_2",
+    "phone": 10000000002,
 }
 
 MOCK_NEW_DEALER_3 = {
     "dealer_name": "dealer_3",
     "address": "address_2",
-    "phone": "phone_1",
+    "phone": 10000000001,
 }
 
 MOCK_NEW_CAR_1 = {
     "model": "model_1",
-    "year": 1,
+    "year": 2001,
     "color": "color_1",
     "mileage": 1,
     "price": 1,
@@ -28,7 +28,7 @@ MOCK_NEW_CAR_1 = {
 
 MOCK_NEW_CAR_2 = {
     "model": "model_1",
-    "year": 2,
+    "year": 2002,
     "color": "color_1",
     "mileage": 1,
     "price": 2,
@@ -36,7 +36,7 @@ MOCK_NEW_CAR_2 = {
 
 MOCK_NEW_CAR_3 = {
     "model": "model_2",
-    "year": 2,
+    "year": 2002,
     "color": "color_1",
     "mileage": 2,
     "price": 2,
@@ -59,12 +59,12 @@ class TestCreateDealer:
                 {
                     "dealer_name": "name",
                     "address": "address",
-                    "phone": "phone",
+                    "phone": 10000000001,
                 },
                 {
                     "address": "address",
                     "dealer_name": "name",
-                    "phone": "phone",
+                    "phone": 10000000001,
                 },
             ),
         ],
@@ -110,6 +110,7 @@ class TestCreateDealer:
 
 
 WRONG_ID = 11111111
+WRONG_PHONE = 12000000000
 
 
 class TestGetDealer:
@@ -124,17 +125,17 @@ class TestGetDealer:
             ({}, [MOCK_NEW_DEALER_1, MOCK_NEW_DEALER_2, MOCK_NEW_DEALER_3]),
             ({"dealer_name": "dealer_1"}, [MOCK_NEW_DEALER_1]),
             ({"address": "address_1"}, [MOCK_NEW_DEALER_1, MOCK_NEW_DEALER_2]),
-            ({"phone": "phone_1"}, [MOCK_NEW_DEALER_1, MOCK_NEW_DEALER_3]),
+            ({"phone": 10000000001}, [MOCK_NEW_DEALER_1, MOCK_NEW_DEALER_3]),
             (
                 {
                     "dealer_name": "dealer_1",
                     "address": "address_1",
-                    "phone": "phone_1",
+                    "phone": 10000000001,
                 },
                 [MOCK_NEW_DEALER_1],
             ),
             ({"dealer_name": "wrong_name"}, []),
-            ({"dealer_name": "dealer_1", "phone": "wrong_phone"}, []),
+            ({"dealer_name": "dealer_1", "phone": WRONG_PHONE}, []),
             ({"id": WRONG_ID}, []),
         ],
     )
@@ -169,7 +170,7 @@ class TestChangeDealer:
                 {
                     "address": "address_1",
                     "dealer_name": "new_name",
-                    "phone": "phone_1",
+                    "phone": 10000000001,
                 },
             ),
             (
@@ -177,27 +178,27 @@ class TestChangeDealer:
                 {
                     "address": "new_address",
                     "dealer_name": "dealer_1",
-                    "phone": "phone_1",
+                    "phone": 10000000001,
                 },
             ),
             (
-                {"phone": "new_phone"},
+                {"phone": 18000000001},
                 {
                     "address": "address_1",
                     "dealer_name": "dealer_1",
-                    "phone": "new_phone",
+                    "phone": 18000000001,
                 },
             ),
             (
                 {
                     "dealer_name": "new_name",
                     "address": "new_address",
-                    "phone": "new_phone",
+                    "phone": 18000000001,
                 },
                 {
                     "address": "new_address",
                     "dealer_name": "new_name",
-                    "phone": "new_phone",
+                    "phone": 18000000001,
                 },
             ),
             (
@@ -205,7 +206,7 @@ class TestChangeDealer:
                 {
                     "address": "address_1",
                     "dealer_name": "dealer_1",
-                    "phone": "phone_1",
+                    "phone": 10000000001,
                 },
             ),
         ],
@@ -304,11 +305,11 @@ class TestCreateCar:
             (
                 {
                     "model": "model",
-                    "year": 1,
+                    "year": 2010,
                 },
                 {
                     "model": "model",
-                    "year": 1,
+                    "year": 2010,
                     "color": None,
                     "mileage": None,
                     "price": None,
@@ -356,14 +357,14 @@ class TestCreateCar:
             (
                 {
                     "model": "model",
-                    "year": 1,
+                    "year": 2010,
                     "color": "color",
                     "mileage": 1,
                     "price": 1,
                 },
                 {
                     "model": "model",
-                    "year": 1,
+                    "year": 2010,
                     "color": "color",
                     "mileage": 1,
                     "price": 1,
@@ -406,9 +407,9 @@ class TestCreateCar:
         assert response.status_code == 422
 
 
-WRONG_YEAR = 11111111
-WRONG_MILEAGE = 11111111
-WRONG_PRICE = 11111111
+WRONG_YEAR = 1980
+WRONG_MILEAGE = 111111
+WRONG_PRICE = 111111
 WRONG_DEALER_ID = 11111111
 WRONG_CAR_ID = 11111111
 
@@ -425,8 +426,8 @@ class TestGetCar:
             ({}, [MOCK_NEW_CAR_1, MOCK_NEW_CAR_2, MOCK_NEW_CAR_3]),
             ({"model": "model_1"}, [MOCK_NEW_CAR_1, MOCK_NEW_CAR_2]),
             ({"model": "model_2"}, [MOCK_NEW_CAR_3]),
-            ({"year": 1}, [MOCK_NEW_CAR_1]),
-            ({"year": 2}, [MOCK_NEW_CAR_2, MOCK_NEW_CAR_3]),
+            ({"year": 2001}, [MOCK_NEW_CAR_1]),
+            ({"year": 2002}, [MOCK_NEW_CAR_2, MOCK_NEW_CAR_3]),
             (
                 {"color": "color_1"},
                 [MOCK_NEW_CAR_1, MOCK_NEW_CAR_2, MOCK_NEW_CAR_3],
@@ -505,17 +506,17 @@ class TestChangeCar:
                 {"model": "new_model"},
                 {
                     "model": "new_model",
-                    "year": 1,
+                    "year": 2001,
                     "color": "color_1",
                     "mileage": 1,
                     "price": 1.0,
                 },
             ),
             (
-                {"year": 2},
+                {"year": 2011},
                 {
                     "model": "model_1",
-                    "year": 2,
+                    "year": 2011,
                     "color": "color_1",
                     "mileage": 1,
                     "price": 1.0,
@@ -525,7 +526,7 @@ class TestChangeCar:
                 {"color": "new_color"},
                 {
                     "model": "model_1",
-                    "year": 1,
+                    "year": 2001,
                     "color": "new_color",
                     "mileage": 1,
                     "price": 1.0,
@@ -535,7 +536,7 @@ class TestChangeCar:
                 {"mileage": 2},
                 {
                     "model": "model_1",
-                    "year": 1,
+                    "year": 2001,
                     "color": "color_1",
                     "mileage": 2,
                     "price": 1.0,
@@ -545,7 +546,7 @@ class TestChangeCar:
                 {"price": 2.0},
                 {
                     "model": "model_1",
-                    "year": 1,
+                    "year": 2001,
                     "color": "color_1",
                     "mileage": 1,
                     "price": 2.0,
@@ -554,14 +555,14 @@ class TestChangeCar:
             (
                 {
                     "model": "new_model",
-                    "year": 2,
+                    "year": 2002,
                     "color": "new_color",
                     "mileage": 2,
                     "price": 2.0,
                 },
                 {
                     "model": "new_model",
-                    "year": 2,
+                    "year": 2002,
                     "color": "new_color",
                     "mileage": 2,
                     "price": 2.0,
@@ -571,7 +572,7 @@ class TestChangeCar:
                 {},
                 {
                     "model": "model_1",
-                    "year": 1,
+                    "year": 2001,
                     "color": "color_1",
                     "mileage": 1,
                     "price": 1.0,

@@ -1,0 +1,8 @@
+[flake8]
+exclude =
+    *_venv
+    venv_*
+    alembic
+    config.py
+per-file-ignores =
+    app.py: F821

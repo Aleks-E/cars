@@ -32,7 +32,6 @@ def create_test_db():
 @pytest.fixture
 def testing_app(create_test_db):
     engine = create_engine(TEST_DATABASE_URL)
-    # models.Base.metadata.drop_all(bind=engine)
     models.Base.metadata.create_all(bind=engine)
     Session = sessionmaker(bind=engine)
 
